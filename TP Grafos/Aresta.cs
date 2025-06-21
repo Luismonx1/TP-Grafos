@@ -18,10 +18,5 @@ namespace TP_Grafos
             this.Fim = Fim;
             this.Peso = Peso;
         }
-
-        public override string ToString()
-        {
-            return $"{Inicio} -- {Peso} -> {Fim}";
-        }
     }
 }

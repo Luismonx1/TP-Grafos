@@ -140,29 +140,46 @@ namespace TP_Grafos
             menu.Resultado();
             Console.WriteLine("Informe o vértice:");
             int vertice = int.Parse(Console.ReadLine());
-            if (vertice < 0 || vertice >= grafo.quantVertices)
+
+            if (vertice >= 0 && vertice < grafo.quantVertices)
+            {
+                List<int> adjacentes = new List<int>();
+
+                foreach (Aresta aresta in grafo.ListaArestas)
+                {
+                    int adj = -1;
+                    if (aresta.Inicio == vertice)
+                    {
+                        adj = aresta.Fim;
+                    }
+                    else if (aresta.Fim == vertice)
+                    {
+                        adj = aresta.Inicio;
+                    }
+
+                    if (adj != -1 && !adjacentes.Contains(adj))
+                    {
+                        adjacentes.Add(adj);
+                    }
+                }
+
+                if (adjacentes.Count > 0)
+                {
+                    adjacentes.Sort();
+                    Console.WriteLine($"\nVértices adjacentes ao vértice {vertice}:");
+                    foreach (int v in adjacentes)
+                    {
+                        Console.WriteLine(v);
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Nenhum vértice adjacente encontrado.");
+                }
+            }
+            else
             {
                 Console.WriteLine($"Vértice inválido! Informe um valor entre 0 e {grafo.quantVertices - 1}.");
-                return;
-            }
-            bool encontrou = false;
-            Console.WriteLine($"\nVértices adjacentes ao vértice {vertice}:");
-            foreach (Aresta aresta in grafo.ListaArestas)
-            {
-                if (aresta.Inicio == vertice)
-                {
-                    Console.WriteLine(aresta.Fim);
-                    encontrou = true;
-                }
-                else if (aresta.Fim == vertice)
-                {
-                    Console.WriteLine(aresta.Inicio);
-                    encontrou = true;
-                }
-            }
-            if (!encontrou)
-            {
-                Console.WriteLine("Nenhum vértice adjacente encontrado.");
             }
         }
 
@@ -182,7 +199,7 @@ namespace TP_Grafos
             {
                 if (aresta.Inicio == vertice || aresta.Fim == vertice)
                 {
-                    aresta.ToString();
+                    Console.WriteLine($"{aresta.Inicio} -- {aresta.Peso} -> {aresta.Fim}");
                     encontrou = true;
                 }
             }
@@ -212,9 +229,9 @@ namespace TP_Grafos
 
             if (encontrou)
             {
-                Console.WriteLine($"\nVértices incidentes à aresta ({inicio} → {fim}):");
-                Console.WriteLine($"- Vértice de origem: {inicio}");
-                Console.WriteLine($"- Vértice de destino: {fim}");
+                Console.WriteLine($"\nVértices incidentes a aresta ({inicio} → {fim}):");
+                Console.WriteLine($"- Vértice de inicio: {inicio}");
+                Console.WriteLine($"- Vértice final: {fim}");
             }
             else
             {
@@ -222,11 +239,43 @@ namespace TP_Grafos
             }
         }
 
+        public void ImprimirGrauDoVertice(Grafo grafo)
+        {
+            menu.Resultado();
+            int grauEntrada = 0;
+            int grauSaida = 0;
+            Console.Write("Informe o vértice: ");
+            int v = int.Parse(Console.ReadLine());
+
+            if (v < 0 || v >= grafo.quantVertices)
+            {
+                Console.WriteLine($"Vértice inválido! Informe um valor entre 0 e {grafo.quantVertices - 1}.");
+                return;
+            }
+
+            foreach (Aresta aresta in grafo.ListaArestas)
+            {
+                if (aresta.Inicio == v)
+                {
+                    grauSaida++;
+                }
+                if (aresta.Fim == v)
+                {
+                    grauEntrada++;
+                }
+            }
+            Console.WriteLine($"\nGrau do vértice {v}:");
+            Console.WriteLine($"- Grau de saída: {grauSaida}");
+            Console.WriteLine($"- Grau de entrada: {grauEntrada}");
+            Console.WriteLine($"- Grau total: {grauEntrada + grauSaida}");
+        }
+
         public bool VerticesSaoAdjacentes(Grafo grafo)
         {
-            Console.WriteLine("Informe o primeiro vértice:");
+            menu.Resultado();
+            Console.WriteLine("Digite o primeiro vértice:");
             int v1 = int.Parse(Console.ReadLine());
-            Console.WriteLine("Informe o segundo vértice:");
+            Console.WriteLine("Digite o segundo vértice:");
             int v2 = int.Parse(Console.ReadLine());
 
             if (v1 < 0 || v1 >= grafo.quantVertices || v2 < 0 || v2 >= grafo.quantVertices)
@@ -276,11 +325,309 @@ namespace TP_Grafos
             }
         }
 
+        public void TrocarVertices(Grafo grafo)
+        {
+            menu.Resultado();
+
+            Console.Write("Digite o primeiro vértice: ");
+            int v1 = int.Parse(Console.ReadLine());
+            Console.Write("Digite o segundo vértice: ");
+            int v2 = int.Parse(Console.ReadLine());
+
+            if (v1 < 0 || v1 >= grafo.quantVertices || v2 < 0 || v2 >= grafo.quantVertices)
+            {
+                Console.WriteLine("Vértices inválidos!");
+                return;
+            }
+
+            foreach (Aresta aresta in grafo.ListaArestas)
+            {
+                if (aresta.Inicio == v1)
+                {
+                    aresta.Inicio = v2;
+                }
+                else if (aresta.Inicio == v2)
+                {
+                    aresta.Inicio = v1;
+                }
+
+                if (aresta.Fim == v1)
+                {
+                    aresta.Fim = v2;
+                }
+                else if (aresta.Fim == v2)
+                {
+                    aresta.Fim = v1;
+                }
+            }
+            Console.WriteLine($"\nOs vértices {v1} e {v2} foram trocados com sucesso.");
+        }
+
+        public void BuscaEmLargura(Grafo grafo)
+        {
+            menu.Resultado();
+        }
+
+        public void DFS(int u, int nivelAtual,
+                List<List<int>> listaAdj,
+                bool[] visitado,
+                int[] descoberta,
+                int[] finalizacao,
+                int[] nivel,
+                ref int tempo,
+                List<(int, int)> arvoreBusca)
+        {
+            tempo++;
+            descoberta[u] = tempo;
+            visitado[u] = true;
+            nivel[u] = nivelAtual;
+
+            foreach (int v in listaAdj[u])
+            {
+                if (!visitado[v])
+                {
+                    arvoreBusca.Add((u, v));
+                    DFS(v, nivelAtual + 1, listaAdj, visitado, descoberta, finalizacao, nivel, ref tempo, arvoreBusca);
+                }
+            }
+
+            tempo++;
+            finalizacao[u] = tempo;
+        }
+
         public void BuscaEmProfundidade(Grafo grafo)
         {
             menu.Resultado();
-            Console.Write("Informe o vértice inicial para a busca em profundidade: ");
+
+            Console.Write("Digite o vértice inicial: ");
             int inicio = int.Parse(Console.ReadLine());
+
+            if (inicio >= 0 && inicio < grafo.quantVertices)
+            {
+                int tempo = 0;
+                int[] descoberta = new int[grafo.quantVertices];
+                int[] finalizacao = new int[grafo.quantVertices];
+                int[] nivel = new int[grafo.quantVertices];
+                bool[] visitado = new bool[grafo.quantVertices];
+                List<(int, int)> arvoreBusca = new List<(int, int)>();
+                List<List<int>> listaAdj = new List<List<int>>();
+                for (int i = 0; i < grafo.quantVertices; i++)
+                    listaAdj.Add(new List<int>());
+
+                foreach (Aresta aresta in grafo.ListaArestas)
+                {
+                    listaAdj[aresta.Inicio].Add(aresta.Fim);
+                }
+
+                for (int i = 0; i < grafo.quantVertices; i++)
+                {
+                    listaAdj[i].Sort();
+                }
+
+                DFS(inicio, 0, listaAdj, visitado, descoberta, finalizacao, nivel, ref tempo, arvoreBusca);
+
+                Console.WriteLine("\nÁrvore de busca (arestas utilizadas):");
+                foreach (var aresta in arvoreBusca)
+                {
+                    Console.WriteLine($"{aresta.Item1} → {aresta.Item2}");
+                }
+                Console.WriteLine("\nDescoberta, Finalização e Nível dos vértices:");
+                for (int i = 0; i < grafo.quantVertices; i++)
+                {
+                    Console.WriteLine($"Vértice {i}: Tempo de Descoberta = {descoberta[i]}, Tempo de Finalização = {finalizacao[i]}, Nível = {nivel[i]}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Vértice inválido.");
+            }
+        }
+
+        public void Dijkstra(Grafo grafo)
+        {
+            menu.Resultado();
+            Console.Write("Digite o vértice de origem: ");
+            int origem = int.Parse(Console.ReadLine());
+            Console.Write("Digite o vértice de destino: ");
+            int destino = int.Parse(Console.ReadLine());
+
+            if (origem >= 0 && origem < grafo.quantVertices && destino >= 0 && destino < grafo.quantVertices)
+            {
+                double[] dist = new double[grafo.quantVertices];
+                int[] anterior = new int[grafo.quantVertices];
+                bool[] visitado = new bool[grafo.quantVertices];
+
+                for (int i = 0; i < grafo.quantVertices; i++)
+                {
+                    dist[i] = double.MaxValue;
+                    anterior[i] = -1;
+                }
+
+                dist[origem] = 0;
+
+                for (int i = 0; i < grafo.quantVertices; i++)
+                {
+                    int u = -1;
+                    double menorDist = double.MaxValue;
+
+                    for (int j = 0; j < grafo.quantVertices; j++)
+                    {
+                        if (!visitado[j] && dist[j] < menorDist)
+                        {
+                            menorDist = dist[j];
+                            u = j;
+                        }
+                    }
+
+                    if (u == -1)
+                    {
+                        i = grafo.quantVertices;
+                    }
+                    else
+                    {
+                        visitado[u] = true;
+
+                        foreach (Aresta aresta in grafo.ListaArestas)
+                        {
+                            if (aresta.Inicio == u)
+                            {
+                                int v = aresta.Fim;
+                                double peso = aresta.Peso;
+
+                                if (dist[u] + peso < dist[v])
+                                {
+                                    dist[v] = dist[u] + peso;
+                                    anterior[v] = u;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (dist[destino] != double.MaxValue)
+                {
+                    List<int> caminho = new List<int>();
+                    int atual = destino;
+                    while (atual != -1)
+                    {
+                        caminho.Insert(0, atual);
+                        atual = anterior[atual];
+                    }
+
+                    Console.WriteLine($"\nCaminho mínimo de {origem} até {destino}. Distância total: {dist[destino]}");
+                    for (int i = 0; i < caminho.Count - 1; i++)
+                    {
+                        int de = caminho[i];
+                        int para = caminho[i + 1];
+                        double peso = grafo.ListaArestas.First(a => a.Inicio == de && a.Fim == para).Peso;
+                        Console.WriteLine($"{de} → {para} (peso: {peso})");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"\nNão existe caminho de {origem} até {destino}.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Vértices inválidos.");
+            }
+        }
+
+        public void FloydWarshall(Grafo grafo)
+        {
+            menu.Resultado();
+            Console.Write("Digite o vértice de origem: ");
+            int origem = int.Parse(Console.ReadLine());
+
+            if (origem >= 0 && origem < grafo.quantVertices)
+            {
+                int n = grafo.quantVertices;
+                double[,] dist = new double[n, n];
+                int[,] anterior = new int[n, n];
+
+                for (int i = 0; i < n; i++)
+                {
+                    for (int j = 0; j < n; j++)
+                    {
+                        if (i == j)
+                            dist[i, j] = 0;
+                        else
+                            dist[i, j] = double.MaxValue;
+
+                        anterior[i, j] = -1;
+                    }
+                }
+
+                foreach (Aresta aresta in grafo.ListaArestas)
+                {
+                    dist[aresta.Inicio, aresta.Fim] = aresta.Peso;
+                    anterior[aresta.Inicio, aresta.Fim] = aresta.Inicio;
+                }
+
+                for (int k = 0; k < n; k++)
+                {
+                    for (int i = 0; i < n; i++)
+                    {
+                        for (int j = 0; j < n; j++)
+                        {
+                            if (dist[i, k] != double.MaxValue && dist[k, j] != double.MaxValue)
+                            {
+                                double novaDist = dist[i, k] + dist[k, j];
+                                if (novaDist < dist[i, j])
+                                {
+                                    dist[i, j] = novaDist;
+                                    anterior[i, j] = anterior[k, j];
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Console.WriteLine($"\nCaminhos mínimos a partir do vértice {origem}:\n");
+
+                for (int destino = 0; destino < n; destino++)
+                {
+                    if (destino != origem)
+                    {
+                        Console.Write($"Caminho até {destino}: ");
+
+                        if (dist[origem, destino] == double.MaxValue)
+                        {
+                            Console.WriteLine("não existe caminho.");
+                        }
+                        else
+                        {
+                            List<int> caminho = new List<int>();
+                            int atual = destino;
+
+                            while (atual != origem && atual != -1)
+                            {
+                                caminho.Insert(0, atual);
+                                atual = anterior[origem, atual];
+                            }
+
+                            if (atual == -1)
+                            {
+                                Console.WriteLine("erro na reconstrução do caminho.");
+                            }
+                            else
+                            {
+                                caminho.Insert(0, origem);
+                                for (int i = 0; i < caminho.Count - 1; i++)
+                                {
+                                    Console.Write($"{caminho[i]} → ");
+                                }
+                                Console.WriteLine($"{caminho.Last()} (custo: {dist[origem, destino]})");
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                Console.WriteLine("Vértice inválido.");
+            }
         }
     }
 }
