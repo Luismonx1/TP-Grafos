@@ -74,14 +74,17 @@ class Program
 
                     break;
                 case 3:
-
+                    menu.Resultado();
+                    metodos.ImpressaoGrafoArquivo();
                     break;
                 case 4:
                     metodos.ImprimirArestasAdjacentes(grafo);
                     break;
                 case 5:
+                    metodos.ImprimirVerticesAdjacentesVertice(grafo);
                     break;
                 case 6:
+                    metodos.ImprimirArestasIncidentesVertice(grafo);
                     break;
                 case 7:
                     metodos.ImprimirVerticesIncidentesArestas(grafo);
@@ -89,6 +92,7 @@ class Program
                 case 8:
                     break;
                 case 9:
+                    metodos.VerticesSaoAdjacentes(grafo);
                     break;
                 case 10:
                     metodos.SubstituirPesoAresta(grafo);

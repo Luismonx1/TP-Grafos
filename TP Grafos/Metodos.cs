@@ -15,7 +15,6 @@ namespace TP_Grafos
         public double CalcDensidade(Grafo grafo)
         {
             double DensidadeGrafo = (double)grafo.quantArestas / (grafo.quantVertices * (grafo.quantVertices - 1.0));
-
             return DensidadeGrafo;
         }
 
@@ -72,9 +71,56 @@ namespace TP_Grafos
             }
         }
 
+        public void ImpressaoGrafoArquivo()
+        {
+            int count = 0;
+            Grafo grafoArq = null;
+            try
+            {
+                StreamReader arquivo = new StreamReader("GrafoEntrada.txt", Encoding.UTF8);
+                string linha = arquivo.ReadLine();
+                while (linha != null)
+                {
+                    count++;
+
+                    if (count == 1)
+                    {
+                        string[] VerArestas = linha.Split(' ');
+                        int vertices = int.Parse(VerArestas[0]);
+                        int arestas = int.Parse(VerArestas[1]);
+                        grafoArq = new Grafo(vertices, arestas);
+                    }
+                    linha = arquivo.ReadLine();
+                    while ((linha = arquivo.ReadLine()) != null)
+                    {
+                        string[] partes = linha.Split(' ');
+                        int inicio = int.Parse(partes[0]);
+                        int fim = int.Parse(partes[1]);
+                        double peso = double.Parse(partes[2]);
+                        grafoArq.ListaArestas.Add(new Aresta(inicio, fim, peso));
+                    }
+                }
+                arquivo.Close();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Exception: " + e.Message);
+            }
+            double densidade = CalcDensidade(grafoArq);
+
+            if (densidade < 0.5)
+            {
+                ImprimirListaAdjacencia(grafoArq);
+            }
+            else
+            {
+                ImprimirMatrizAdjacencia(grafoArq);
+            }
+        }
+
         public void ImprimirArestasAdjacentes(Grafo grafo)
         {
-           menu.Resultado();
+            menu.Resultado();
             Console.Write("Informe o vértice de início da aresta:");
             int inicio = int.Parse(Console.ReadLine());
             Console.Write("Informe o vértice de fim da aresta:");
@@ -86,6 +132,63 @@ namespace TP_Grafos
                 {
                     Console.WriteLine($"Aresta de {aresta.Inicio} para {aresta.Fim} com peso {aresta.Peso}");
                 }
+            }
+        }
+
+        public void ImprimirVerticesAdjacentesVertice(Grafo grafo)
+        {
+            menu.Resultado();
+            Console.WriteLine("Informe o vértice:");
+            int vertice = int.Parse(Console.ReadLine());
+            if (vertice < 0 || vertice >= grafo.quantVertices)
+            {
+                Console.WriteLine($"Vértice inválido! Informe um valor entre 0 e {grafo.quantVertices - 1}.");
+                return;
+            }
+            bool encontrou = false;
+            Console.WriteLine($"\nVértices adjacentes ao vértice {vertice}:");
+            foreach (Aresta aresta in grafo.ListaArestas)
+            {
+                if (aresta.Inicio == vertice)
+                {
+                    Console.WriteLine(aresta.Fim);
+                    encontrou = true;
+                }
+                else if (aresta.Fim == vertice)
+                {
+                    Console.WriteLine(aresta.Inicio);
+                    encontrou = true;
+                }
+            }
+            if (!encontrou)
+            {
+                Console.WriteLine("Nenhum vértice adjacente encontrado.");
+            }
+        }
+
+        public void ImprimirArestasIncidentesVertice(Grafo grafo)
+        {
+            menu.Resultado();
+            Console.WriteLine("Informe o vértice:");
+            int vertice = int.Parse(Console.ReadLine());
+            if (vertice < 0 || vertice >= grafo.quantVertices)
+            {
+                Console.WriteLine($"Vértice inválido! Informe um valor entre 0 e {grafo.quantVertices - 1}.");
+                return;
+            }
+            bool encontrou = false;
+            Console.WriteLine($"\nArestas incidentes ao vértice {vertice}:");
+            foreach (Aresta aresta in grafo.ListaArestas)
+            {
+                if (aresta.Inicio == vertice || aresta.Fim == vertice)
+                {
+                    aresta.ToString();
+                    encontrou = true;
+                }
+            }
+            if (!encontrou)
+            {
+                Console.WriteLine("Nenhuma aresta incidente detectada.");
             }
         }
 
@@ -119,6 +222,32 @@ namespace TP_Grafos
             }
         }
 
+        public bool VerticesSaoAdjacentes(Grafo grafo)
+        {
+            Console.WriteLine("Informe o primeiro vértice:");
+            int v1 = int.Parse(Console.ReadLine());
+            Console.WriteLine("Informe o segundo vértice:");
+            int v2 = int.Parse(Console.ReadLine());
+
+            if (v1 < 0 || v1 >= grafo.quantVertices || v2 < 0 || v2 >= grafo.quantVertices)
+            {
+                Console.WriteLine("Vértices inválidos! Informe vértices dentro do intervalo válido.");
+                return false;
+            }
+
+            foreach (Aresta aresta in grafo.ListaArestas)
+            {
+                if (aresta.Inicio == v1 && aresta.Fim == v2)
+                {
+                    Console.WriteLine($"Os vértices {v1} e {v2} são adjacentes.");
+                    return true;
+                }
+            }
+
+            Console.WriteLine($"Os vértices {v1} e {v2} não são adjacentes.");
+            return false;
+        }
+
         public void SubstituirPesoAresta(Grafo grafo)
         {
             menu.Resultado();
@@ -147,10 +276,11 @@ namespace TP_Grafos
             }
         }
 
-        public void BuscaEmProfundidade()
+        public void BuscaEmProfundidade(Grafo grafo)
         {
             menu.Resultado();
-
+            Console.Write("Informe o vértice inicial para a busca em profundidade: ");
+            int inicio = int.Parse(Console.ReadLine());
         }
     }
 }

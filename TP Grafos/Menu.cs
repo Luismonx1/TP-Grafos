@@ -8,7 +8,7 @@ namespace TP_Grafos
 {
     internal class Menu
     {
-        public Menu() { }   
+        public Menu() { }
 
         public void Cabecalho()
         {
