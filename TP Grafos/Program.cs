@@ -1,113 +1,22 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
+using TP_Grafos;
 
-class Aresta
+class Program
 {
-    public int Inicio;
-    public int Fim;
-    public double Peso;
-    public Aresta(int Inicio, int Fim, double Peso)
-    {
-        this.Inicio = Inicio;
-        this.Fim = Fim;
-        this.Peso = Peso;
-    }
-
-    public override string ToString()
-    {
-        return $"{Inicio} -- {Peso} -> {Fim}";
-    }
-}
-
-class Grafo
-{
-    public int quantVertices;
-    public int quantArestas;
-    public double DensidadeGrafo;
-    public int[,] matrizAdjacencia;
-    public List<Aresta> ListaArestas = new List<Aresta>();
-
-    public Grafo(int quantVertices, int quantArestas)
-    {
-        this.quantVertices = quantVertices;
-        this.quantArestas = quantArestas;
-    }
-
-    public double CalcDensidade()
-    {
-        double DensidadeGrafo = (double)quantArestas / (quantVertices * (quantVertices - 1.0));
-
-        return DensidadeGrafo;
-    }
-
-    public void ImprimirMatrizAdjacencia()
-    {
-        matrizAdjacencia = new int[quantVertices, quantVertices];
-
-        for (int i = 0; i < quantVertices; i++)
-        {
-            for (int j = 0; j < quantVertices; j++)
-            {
-                matrizAdjacencia[i, j] = 0;
-            }
-        }
-            
-        foreach (Aresta aresta in ListaArestas)
-        {
-           matrizAdjacencia[aresta.Inicio, aresta.Fim] = 1;
-        }
-
-        Console.WriteLine("Matriz de Adjacência:");
-        for (int i = 0; i < quantVertices; i++)
-        {
-            for (int j = 0; j < quantVertices; j++)
-            {
-                Console.Write($"{matrizAdjacencia[i, j]}");
-            }
-            Console.WriteLine();
-        }
-    }
-    public void ImprimirListaAdjacencia()
-    {
-        List<List<int>> listaAdj = new List<List<int>>();
-
-        for (int i = 0; i < quantVertices; i++)
-        {
-            listaAdj.Add(new List<int>());
-        }
-
-        foreach (Aresta aresta in ListaArestas)
-        {
-            listaAdj[aresta.Inicio].Add(aresta.Fim);
-        }
-
-        for (int i = 0; i < quantVertices; i++)
-        {
-            Console.Write($"Vértice {i}");
-            foreach (int proximo in listaAdj[i])
-            {
-                Console.Write($" -> {proximo}");
-            }
-            Console.WriteLine() ;
-        }
-    }
-}
-internal class Program
-{
-    static void Cabecalho()
-    {
-        Console.Clear();
-        Console.WriteLine("Representação de um Grafo");
-        Console.WriteLine("=============");
-    }
-
-    private static void Main(string[] args)
+    public static void Main(string[] args)
     {
         double densidade;
         int vertices = 0;
         int arestas = 0;
-        Cabecalho();
+        int op = 1;
+
+        Metodos metodos = new Metodos();
+        Menu menu = new Menu();
+
+        menu.Cabecalho();
+
         Console.WriteLine("Digite o número de vértices: ");
         vertices = int.Parse(Console.ReadLine());
         Console.WriteLine("Digite o número de arestas: ");
@@ -122,16 +31,79 @@ internal class Program
             double peso = double.Parse(partes[2]);
             grafo.ListaArestas.Add(new Aresta(inicio, fim, peso));
         }
-        densidade = grafo.CalcDensidade();
-        if (densidade < 0.5)
+        Console.WriteLine();
+        densidade = metodos.CalcDensidade(grafo);
+
+        while (op != 0)
         {
-            Console.WriteLine("Representando por meio de uma Lista de Adjacencia: ");
-            grafo.ImprimirListaAdjacencia();
-        }
-        else
-        {
-            Console.WriteLine("Representando por meio de uma Matriz de Adjacencia: ");
-            grafo.ImprimirMatrizAdjacencia();
+            menu.Corpo();
+
+            Console.WriteLine("Digite a opção");
+            op = int.Parse(Console.ReadLine());
+
+            switch (op)
+            {
+                case 0:
+
+                    break;
+
+                case 1:
+                    menu.Resultado();
+
+                    if (densidade < 0.5)
+                    {
+                        metodos.ImprimirListaAdjacencia(grafo);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Não é possivel pois a densidade é maior que 0.5");
+                    }
+
+                    break;
+                case 2:
+                    menu.Resultado();
+
+                    if (densidade > 0.5)
+                    {
+                        metodos.ImprimirMatrizAdjacencia(grafo);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Não é possivel pois a densidade é menor que 0.5");
+                    }
+
+                    break;
+                case 3:
+
+                    break;
+                case 4:
+                    metodos.ImprimirArestasAdjacentes(grafo);
+                    break;
+                case 5:
+                    break;
+                case 6:
+                    break;
+                case 7:
+                    metodos.ImprimirVerticesIncidentesArestas(grafo);
+                    break;
+                case 8:
+                    break;
+                case 9:
+                    break;
+                case 10:
+                    metodos.SubstituirPesoAresta(grafo);
+                    break;
+                case 11:
+                    break;
+                case 12:
+                    break;
+                case 13:
+                    break;
+                case 14:
+                    break;
+                case 15:
+                    break;
+            }
         }
     }
 }
