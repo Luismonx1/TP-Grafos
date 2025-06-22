@@ -366,6 +366,70 @@ namespace TP_Grafos
         public void BuscaEmLargura(Grafo grafo)
         {
             menu.Resultado();
+            Console.WriteLine("Digite o vértice inicial:");
+            int inicio = int.Parse(Console.ReadLine());
+
+            int[] nivel = new int[grafo.quantVertices];
+            int[] pai = new int[grafo.quantVertices];
+            int[] L = new int[grafo.quantVertices];
+            int tempo = 1;
+
+            Queue<int> fila = new Queue<int>();
+
+            for (int i = 0; i < grafo.quantVertices; i++)
+            {
+                nivel[i] = -1;
+                pai[i] = -1;
+                L[i] = 0;
+            }
+
+            nivel[inicio] = 0;
+            L[inicio] = tempo;
+            fila.Enqueue(inicio);
+
+            while (fila.Count > 0)
+            {
+                int v = fila.Dequeue();
+
+                List<int> vizinhos = new List<int>();
+                foreach (Aresta aresta in grafo.ListaArestas)
+                {
+                    if (aresta.Inicio == v)
+                        vizinhos.Add(aresta.Fim);
+                }
+                vizinhos.Sort();
+
+                foreach (int w in vizinhos)
+                {
+                    if (nivel[w] == -1)
+                    {
+                        Console.WriteLine($"Aresta de Árvore: {{{v}, {w}}}");
+                        pai[w] = v;
+                        nivel[w] = nivel[v] + 1;
+                        tempo++;
+                        L[w] = tempo;
+                        fila.Enqueue(w);
+                    }
+                    else if (nivel[w] == nivel[v] + 1)
+                    {
+                        Console.WriteLine($"Aresta Tio: {{{v}, {w}}}");
+                    }
+                    else if (nivel[w] == nivel[v] && pai[v] == pai[w] && L[w] > L[v])
+                    {
+                        Console.WriteLine($"Aresta Irmão: {{{v}, {w}}}");
+                    }
+                    else if (nivel[w] == nivel[v] && pai[v] != pai[w] && L[w] > L[v])
+                    {
+                        Console.WriteLine($"Aresta Primo: {{{v}, {w}}}");
+                    }
+                }
+                Console.WriteLine("\nResultado Final:");
+                Console.WriteLine("Vértice\tNível\tPai");
+                for (int i = 0; i < grafo.quantVertices; i++)
+                {
+                    Console.WriteLine($"{i}\t{nivel[i]}\t{(pai[i] == -1 ? "-" : pai[i].ToString())}");
+                }
+            }
         }
 
         public void DFS(int u, int nivelAtual,
